@@ -1,7 +1,3 @@
-"""
-EXTRAINDOS RECEITAS DE IRRF, PIS, COFINS
-"""
-
 import PyPDF3
 import re
 import pandas as pd
@@ -9,13 +5,13 @@ import os
 
 def extract_data_from_pdf(pdf_file):
     pdf_reader = PyPDF3.PdfFileReader(pdf_file)
-    receita_pattern = r'(\d{4}-\d{2}\s-\s\w+)'
+    receita_pattern = r'(\d{4}-\d{2}\s-\s\w+-SEGUR.|\d{4}-\d{2}\s-\s\w+-PATRONAL|\d{4}-\d{2}\s-\s\w+-TERCEIROS|\d{4}-\d{2}\s-\s\w+)'
     pa_exerc_pattern = r'(\d{2}/\d{4})'
     dt_vcto_pattern = r'(\d{2}/\d{2}/\d{4})'
     vl_original_pattern = r'(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)'
     sdo_devedor_pattern = r'(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)'
     # Adicionar parametros
-    situacao_pattern = r'(DEVEDOR|PENDENTE|PAGO)' #
+    situacao_pattern = r'(DEVEDOR|PENDENTE|PAGO)'
     
     
     data = []
@@ -30,7 +26,7 @@ def extract_data_from_pdf(pdf_file):
     return data
 
 # Diretório onde estão localizados os arquivos PDF
-diretorio = 'Pdfs_1'
+diretorio = 'pdfs'
 
 # Lista para armazenar os dados de todos os arquivos PDF
 todos_os_dados = []
@@ -42,21 +38,21 @@ for nome_arquivo in os.listdir(diretorio):
         dados_pdf = extract_data_from_pdf(caminho_arquivo)
         todos_os_dados.extend(dados_pdf)
 
-# Criando um DataFrame com os dados coletados de todos os arquivos PDF
-df = pd.DataFrame(todos_os_dados, columns=['Receita', 'PA/Exerc', 'Dt. Vcto', 'Vl.Original', 'Sdo.Devedor', 'Situação'])
 
-# Nome da pasta para salvar os arquivos CSV
+df = pd.DataFrame(todos_os_dados, columns=['Receita'.ljust(10), 'PA/Exerc'.ljust(10), 'Dt. Vcto'.ljust(10), 'Vl.Original'.ljust(10), 'Sdo.Devedor'.ljust(10), 'Situação'])
+
+
 pasta_destino = 'arquivos_csv'
 
-# Verificar se a pasta destino existe, caso contrário, criar
+
 if not os.path.exists(pasta_destino):
     os.makedirs(pasta_destino)
 
-# Caminho completo para a pasta destino
+
 caminho_pasta_destino = os.path.join(os.getcwd(), pasta_destino)
 
-# Salvando o DataFrame em um arquivo CSV dentro da pasta destino
-nome_arquivo_csv = 'receitas_pis.csv'
+
+nome_arquivo_csv = 'receitas.csv'
 caminho_arquivo_csv = os.path.join(caminho_pasta_destino, nome_arquivo_csv)
 df.to_csv(caminho_arquivo_csv, index=False)
 
@@ -65,9 +61,5 @@ print(df)
 
 
 
-
-
-
-df.to_csv('confis_pis_irrf.csv', index=False)
 print("Arquivo CSV salvo com sucesso.")
 print(df)
