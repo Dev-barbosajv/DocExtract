@@ -4,10 +4,14 @@ Este projeto consiste em uma aplicação web desenvolvida em Python utilizando o
 
 ## Como Funciona
 
-1. **Upload do Arquivo PDF**: O usuário faz o upload de um arquivo PDF contendo dados a serem extraídos.
+1. **Upload do Arquivo PDF**: O usuário faz o upload de um arquivo PDF contendo dados a serem extraídos. O arquivo PDF deve conter informações sobre tributações, como PIS, COFINS, INSS, entre outros.
+
 2. **Extração dos Dados**: Os dados são extraídos do arquivo PDF utilizando expressões regulares.
+
 3. **Visualização dos Dados**: Os dados extraídos são exibidos na interface web para que o usuário possa revisá-los.
+
 4. **Exportação para CSV**: O usuário pode exportar os dados visualizados para um arquivo CSV.
+
 5. **Limpeza de Dados**: Os dados são removidos da sessão após a exportação para garantir a privacidade.
 
 ## Pré-Requisitos
