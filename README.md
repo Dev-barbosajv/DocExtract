@@ -1,4 +1,4 @@
-# Projeto de Extração de Dados de PDF para CSV 🐱‍👤
+# Projeto de Extração de Dados de PDF para CSV 
 
 Este projeto consiste em uma aplicação web desenvolvida em Python utilizando o framework Flask. A principal funcionalidade da aplicação é extrair dados de arquivos PDF e exportá-los para um arquivo CSV.
 
