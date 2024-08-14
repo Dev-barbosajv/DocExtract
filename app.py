@@ -3,8 +3,10 @@ import os
 import re
 import pandas as pd
 import io
+from datetime import datetime
 import csv
 from flask import Flask, make_response, render_template, request, jsonify, redirect, url_for, session, send_file
+import psycopg2
 
 
 app = Flask(__name__, template_folder='html', static_folder='css')
@@ -29,9 +31,41 @@ def extract_data_from_pdf(pdf_file):
 
         for match in re.finditer(f"{receita_pattern}\s+{pa_exerc_pattern}\s+{dt_vcto_pattern}\s+{vl_original_pattern}\s+{sdo_devedor_pattern}\s+{situacao_pattern}", texto_da_pagina):
             receita, pa_exerc, dt_vcto, vl_original, sdo_devedor, situacao = match.groups()
+            dt_vcto = datetime.strptime(dt_vcto, '%d/%m/%Y').strftime('%Y-%m-%d')
             data.append((receita, pa_exerc, dt_vcto, vl_original, sdo_devedor, situacao))
 
     return data
+
+
+def insert_data_into_db(data):
+    try:
+        conn = psycopg2.connect(
+            dbname="postgres",
+            user="joaov",
+            password="2001",
+            host="localhost",
+            port="5432"
+        )
+        cursor = conn.cursor()
+
+        insert_query = """
+        INSERT INTO docs.receitas (receita, pa_exerc, dt_vcto, vl_original, sdo_devedor, situacao)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+
+        for row in data:    
+            row = list(row)
+            row[3] = float(row[3].replace('.', '').replace(',', '.'))
+            row[4] = float(row[4].replace('.', '').replace(',', '.'))
+            cursor.execute(insert_query, row)
+
+        conn.commit()
+
+    except Exception as e:
+        print(f"Erro ao inserir dados: {e}")
+    finally:
+        cursor.close()
+        conn.close()
 
 
 @app.route('/extrair_info', methods=['POST', 'GET'])
@@ -44,8 +78,9 @@ def extract_info():
     if pdf_file.filename.endswith('.pdf'):
         dados = extract_data_from_pdf(pdf_file)
         session['dados'] = dados
+
+        insert_data_into_db(dados)
         return render_template('index.html', dados=dados)
-       
     else:
         return jsonify({'error': 'O arquivo enviado não é um PDF'}), 400
 
