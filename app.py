@@ -72,7 +72,7 @@ def insert_data_into_db(data):
 def extract_info():
     if 'file' not in request.files:
         return jsonify({'error': 'Nenhum arquivo enviado'}), 400
-    
+
     pdf_file = request.files['file']
 
     if pdf_file.filename.endswith('.pdf'):
@@ -92,22 +92,22 @@ def export_csv():
         if dados:
             # Criar um buffer de memória
             csv_buffer = io.StringIO()
-            
+
             # Escrever os dados no buffer
             csv_writer = csv.writer(csv_buffer)
             csv_writer.writerow(['Receita', 'Pa Exerc', 'Dt Vcto', 'Vl Original', 'Sdo Devedor', 'Situação'])
             csv_writer.writerows(dados)
-            
+
             # Criar uma resposta Flask com o conteúdo do buffer
             response = make_response(csv_buffer.getvalue())
-            
+
             # Configurar os cabeçalhos da resposta para download do arquivo CSV
             response.headers['Content-Disposition'] = 'attachment; filename=dados.csv'
             response.headers['Content-Type'] = 'text/csv'
-            
+
             # Limpar os dados da sessão após o download do CSV
             session.pop('dados', None)
-            
+
             return response, 200
         else:
             return jsonify({'error': 'Nenhum dado para exportar em CSV'}), 400
@@ -115,14 +115,12 @@ def export_csv():
     except Exception as e:
         print(f"Erro ao baixar arquivo CSV: {e}")
         return jsonify({'error': 'Erro ao baixar arquivo CSV'}), 500
-            
+
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
 
 
 
